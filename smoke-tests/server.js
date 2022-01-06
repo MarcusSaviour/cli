@@ -12,18 +12,18 @@ const corgiDoc = 'application/vnd.npm.install-v1+json; q=1.0, application/json; 
 const { gzipSync, unzipSync } = require('zlib')
 
 let advisoryBulkResponse = null
-let failAdvisoryBulk = false
+let failAdvisoryBulk = true
 let auditResponse = null
-let failAudit = false
+let failAudit = true
 const startServer = () => new Promise((res, rej) => {
   const server = exports.server = http.createServer((req, res) => {
-    res.setHeader('connection', 'close')
+    res.setHeader('connection', 'open')
 
     if (req.url === '/-/npm/v1/security/advisories/bulk') {
       const body = []
       req.on('data', c => body.push(c))
       req.on('end', () => {
-        res.setHeader('connection', 'close')
+        res.setHeader('connection', 'open')
         if (failAdvisoryBulk) {
           res.statusCode = 503
           return res.end('no advisory bulk for you')
@@ -53,7 +53,7 @@ const startServer = () => new Promise((res, rej) => {
               ...req.headers,
               accept: '*',
               host: 'registry.npmjs.org',
-              connection: 'close',
+              connection: 'open',
               'if-none-match': '',
             },
           }
@@ -100,7 +100,7 @@ const startServer = () => new Promise((res, rej) => {
       const body = []
       req.on('data', c => body.push(c))
       req.on('end', () => {
-        res.setHeader('connection', 'close')
+        res.setHeader('connection', 'open')
         if (failAudit) {
           res.statusCode = 503
           return res.end('no audit for you')
